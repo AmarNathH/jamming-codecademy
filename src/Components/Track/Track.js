@@ -5,7 +5,7 @@ export class Track extends React.Component {
     constructor(props) {
         super(props);
         this.addTrack = this.addTrack.bind(this);
-
+        this.removeTrack = this.removeTrack.bind(this); 
     }
 
     renderAction() {
@@ -13,7 +13,11 @@ export class Track extends React.Component {
     }
 
     addTrack() {
-        this.props.onAdd(this.props.track)
+        this.props.onAdd(this.props.track);
+    }
+
+    removeTrack() {
+        this.props.onRemove(this.props.track);
     }
 
     render() {
@@ -23,7 +27,7 @@ export class Track extends React.Component {
                     {/* <h3><!-- track name will go here --></h3> */}
                     {/* <p><!-- track artist will go here--> | <!-- track album will go here --></p> */}
                 </div>
-                <button className="Track-action" onClick={this.props.addTrack}>{this.renderAction()}</button>
+                <button className="Track-action" onClick={(this.renderAction() === '+' )? this.props.addTrack : this.props.removeTrack}>{this.renderAction()}</button>
             </div>
         );
     }
