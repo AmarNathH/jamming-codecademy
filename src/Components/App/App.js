@@ -3,27 +3,18 @@ import './App.css';
 import { SearchBar } from '../SearchBar/SearchBar';
 import { SearchResults } from '../SearchResults/SearchResults';
 import { Playlist } from '../Playlist/Playlist';
+import { Spotify } from '../../util/spotify';
 
 class App extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      searchResults: [{
-        id: 1,
-        name: "Something Just like this",
-        artist: 'Coldplay',
-        album: 'Coldplay'
-      }],
+      searchResults: [],
 
-      playlistName: "Myfav",
+      playlistName: "",
 
-      playlistTracks: [{
-        id: 2,
-        name: "Roses",
-        artist: 'Chainsmokers',
-        album: 'Chainsmokers'
-      }]
+      playlistTracks: []
     };
 
     this.addTrack = this.addTrack.bind(this);
@@ -36,7 +27,8 @@ class App extends React.Component {
 
   addTrack(track) {
     if( !this.state.playlistTracks.some(playlistTrack => (playlistTrack.id === track.id)) ) {
-      this.setState({playlistTracks : [ this.state.playlistTracks, track ]});
+      this.state.playlistTracks.push(track);
+      this.setState({playlistTracks : this.state.playlistTracks});
     }
   }
 
@@ -49,13 +41,18 @@ class App extends React.Component {
     this.setState({playlistName: name});
   }
 
-  savePlaylist() {
+  savePlaylist(playlistName, tracksUri) {
+    
+
     // generates array of TrackURI from playlistTracks.
     // pass TrackURIs and playlistName to a method to save the playlist to User's account.
   }
 
-  search(term) {
+  async search(term) {
     console.log(`You are searching for the song ${term}`);
+    Spotify.getAccessToken();
+    let searchResults = await Spotify.search(term);
+    this.setState({searchResults: searchResults});
   }
 
   render() {
