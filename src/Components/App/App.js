@@ -41,11 +41,10 @@ class App extends React.Component {
     this.setState({playlistName: name});
   }
 
-  savePlaylist(playlistName, tracksUri) {
-    
-
-    // generates array of TrackURI from playlistTracks.
-    // pass TrackURIs and playlistName to a method to save the playlist to User's account.
+  savePlaylist() {
+    console.log("in save playlist app.js")
+    let tracksUri = this.state.playlistTracks.map(track => track.uri);
+    Spotify.savePlaylist(this.state.playlistName, tracksUri);
   }
 
   async search(term) {
@@ -63,7 +62,7 @@ class App extends React.Component {
           <SearchBar onSearch={this.search} />
           <div className="App-playlist">
             <SearchResults searchResults={this.state.searchResults} onAdd={this.addTrack} />
-            <Playlist playlistName={this.state.playlistName} playlistTracks={this.state.playlistTracks} onRemove={this.removeTrack} onNameChange={this.updatePlaylistName}/>
+            <Playlist playlistName={this.state.playlistName} playlistTracks={this.state.playlistTracks} onRemove={this.removeTrack} onNameChange={this.updatePlaylistName} onSave={this.savePlaylist}/>
           </div>
         </div>
       </div>

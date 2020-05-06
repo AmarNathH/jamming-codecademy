@@ -1,3 +1,5 @@
+import fetch from "node-fetch";
+
 const clientId = "efb90854934645e3b220820d73e9b5aa";
 const clientSecret = "7e86af444ffd43ccb10390cb963d73d1";
 let accessToken = "";
@@ -20,14 +22,13 @@ export const Spotify = {
 
       return accessToken;
     } else {
-      const accessUrl = `https://accounts.spotify.com/authorize?client_id=${clientId}&response_type=token&redirect_uri=${redirectURI}`;
+      const accessUrl = `https://accounts.spotify.com/authorize?client_id=${clientId}&response_type=token&scope=playlist-modify-public&redirect_uri=${redirectURI}`;
       window.location = accessUrl;
     }
-
   },
 
-  search(searchTerm) {
-    return fetch(
+  async search(searchTerm) {
+    let spotifyTracks = await fetch(
       `https://api.spotify.com/v1/search?type=track&q=${searchTerm}`,
       {
         headers: { Authorization: `Bearer ${accessToken}` },
@@ -35,7 +36,6 @@ export const Spotify = {
     )
       .then((response) => response.json())
       .then((jsonResponse) => {
-
         if (!jsonResponse) {
           return [{}];
         }
@@ -49,6 +49,65 @@ export const Spotify = {
         }));
 
         return tracks;
+      })
+      .catch((error) => {
+        console.log("Spotify search error");
+      });
+
+    return spotifyTracks;
+  },
+
+  async savePlaylist(playlistName, tracksUri) {
+    if (!(playlistName && tracksUri)) return;
+
+    // Get spotify user Id
+    let userId = await fetch("https://api.spotify.com/v1/me", {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    })
+      .then((response) => response.json())
+      .then((jsonResponse) => jsonResponse.id)
+      .catch((error) => {
+        console.log("User id Fetch error");
+      });
+
+    // Create playlist
+    let playlistId = await fetch(
+      `https://api.spotify.com/v1/users/${userId}/playlists`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: playlistName,
+        }),
+        json: true,
+      }
+    )
+      .then((response) => response.json())
+      .then((jsonResponse) => jsonResponse.id)
+      .catch((error) => {
+        console.log("Create Playlist error");
+      });
+
+    await fetch(`https://api.spotify.com/v1/playlists/${playlistId}/tracks`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        uris: tracksUri,
+      }),
+    })
+      .then((response) => {
+        console.log("Songs added to playlist");
+      })
+      .catch((error) => {
+        console.log("Fetch error while adding songs to the playlist");
       });
   },
 };
