@@ -1,9 +1,6 @@
-import fetch from "node-fetch";
 
 const clientId = "efb90854934645e3b220820d73e9b5aa";
-const clientSecret = "7e86af444ffd43ccb10390cb963d73d1";
 let accessToken = "";
-let userAccessTokenTime = 0;
 const redirectURI = "http://localhost:3000/";
 
 export const Spotify = {
@@ -27,8 +24,8 @@ export const Spotify = {
     }
   },
 
-  async search(searchTerm) {
-    let spotifyTracks = await fetch(
+  search(searchTerm) {
+    let spotifyTracks = fetch(
       `https://api.spotify.com/v1/search?type=track&q=${searchTerm}`,
       {
         headers: { Authorization: `Bearer ${accessToken}` },
